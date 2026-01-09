@@ -1,0 +1,2784 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Lịch Học - Android & Testing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-bottom: 25px;
+        }
+
+        header h1 {
+            color: #333;
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            min-width: 150px;
+        }
+
+        .stat-box h3 {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .stat-box p {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .filter-box select {
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            background: white;
+            cursor: pointer;
+            min-width: 200px;
+        }
+
+        .filter-box select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .status-filter {
+            display: flex;
+            gap: 10px;
+        }
+
+        .status-btn {
+            padding: 10px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .status-btn:hover, .status-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .chapter {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .chapter-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 25px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chapter-header:hover {
+            opacity: 0.95;
+        }
+
+        .chapter-header h2 {
+            font-size: 1.2em;
+        }
+
+        .chapter-progress {
+            background: rgba(255,255,255,0.3);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .chapter-content {
+            padding: 0;
+            display: none;
+        }
+
+        .chapter-content.open {
+            display: block;
+        }
+
+        .lesson {
+            border-bottom: 1px solid #eee;
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: background 0.2s;
+        }
+
+        .lesson:hover {
+            background: #f8f9ff;
+        }
+
+        .lesson:last-child {
+            border-bottom: none;
+        }
+
+        .lesson-checkbox {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .lesson-number {
+            background: #667eea;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+            flex-shrink: 0;
+        }
+
+        .lesson-info {
+            flex: 1;
+        }
+
+        .lesson-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .lesson-meta {
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .lesson-meta span {
+            margin-right: 15px;
+        }
+
+        .lesson-note {
+            background: #fff3cd;
+            color: #856404;
+            padding: 3px 10px;
+            border-radius: 5px;
+            font-size: 0.8em;
+        }
+
+        .lesson-note.important {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .lesson-note.new {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .view-detail {
+            padding: 8px 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.3s;
+        }
+
+        .view-detail:hover {
+            background: #5a6fd6;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            max-width: 800px;
+            width: 100%;
+            margin: 40px 0;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: modalSlide 0.3s ease;
+        }
+
+        @keyframes modalSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .modal-header h2 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+
+        .modal-header .lesson-id {
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+
+        .close-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .close-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .detail-section {
+            margin-bottom: 20px;
+        }
+
+        .detail-section h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .detail-content {
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 10px;
+            white-space: pre-line;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        .detail-meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .meta-item {
+            background: #e8ebff;
+            padding: 10px 20px;
+            border-radius: 8px;
+        }
+
+        .meta-item label {
+            color: #666;
+            font-size: 0.85em;
+        }
+
+        .meta-item p {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .progress-bar-container {
+            background: #e0e0e0;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .completed .lesson-number {
+            background: #28a745;
+        }
+
+        .completed .lesson-title {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats {
+                flex-direction: column;
+            }
+
+            .stat-box {
+                width: 100%;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .search-box, .filter-box select {
+                width: 100%;
+            }
+
+            .lesson {
+                flex-wrap: wrap;
+            }
+
+            .view-detail {
+                width: 100%;
+                margin-top: 10px;
+            }
+        }
+
+        /* Reset Progress Button */
+        .reset-btn {
+            padding: 10px 20px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .reset-btn:hover {
+            background: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 Quản Lý Lịch Học - Android Development & Testing</h1>
+            <p style="color: #666; margin-top: 5px;">Theo dõi tiến độ học tập của bạn</p>
+            <div class="stats">
+                <div class="stat-box">
+                    <h3>Tổng số bài</h3>
+                    <p id="total-lessons">111</p>
+                </div>
+                <div class="stat-box">
+                    <h3>Đã hoàn thành</h3>
+                    <p id="completed-lessons">0</p>
+                </div>
+                <div class="stat-box">
+                    <h3>Tổng số tiết</h3>
+                    <p id="total-periods">232</p>
+                </div>
+                <div class="stat-box">
+                    <h3>Tiến độ</h3>
+                    <p id="progress-percent">0%</p>
+                </div>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="main-progress" style="width: 0%"></div>
+            </div>
+        </header>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="🔍 Tìm kiếm bài học...">
+            </div>
+            <div class="filter-box">
+                <select id="chapter-filter">
+                    <option value="all">Tất cả chương</option>
+                    <option value="1">Chương 1: Absolute Beginner</option>
+                    <option value="2">Chương 2: Java Fundamentals & OOP</option>
+                    <option value="3">Chương 3: Kotlin Fundamentals</option>
+                    <option value="4">Chương 4: Android Basics</option>
+                    <option value="5">Chương 5: Testing Fundamentals</option>
+                    <option value="6">Chương 6: Android Profiling</option>
+                    <option value="7">Chương 7: Advanced Testing</option>
+                </select>
+            </div>
+            <div class="status-filter">
+                <button class="status-btn active" data-status="all">Tất cả</button>
+                <button class="status-btn" data-status="completed">Đã học</button>
+                <button class="status-btn" data-status="incomplete">Chưa học</button>
+            </div>
+            <button class="reset-btn" onclick="resetProgress()">🔄 Reset</button>
+        </div>
+
+        <div id="chapters-container"></div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="lesson-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2 id="modal-title"></h2>
+                    <div class="lesson-id" id="modal-lesson-id"></div>
+                </div>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-meta" id="modal-meta"></div>
+                <div class="detail-section">
+                    <h3>📖 Chi tiết nội dung học</h3>
+                    <div class="detail-content" id="modal-detail"></div>
+                </div>
+                <div class="detail-section" id="prerequisite-section">
+                    <h3>📋 Nội dung tiên quyết</h3>
+                    <div class="detail-content" id="modal-prerequisite"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Course Data
+        const courseData = [
+            // CHƯƠNG 1: ABSOLUTE BEGINNER - Kiến thức nền tảng (25 tiết)
+            {
+                id: 1,
+                chapter: 1,
+                periods: "1-2",
+                title: "Làm quen với Computer",
+                detail: `• Cách máy tính hoạt động:
+  - CPU architecture basics (ARM vs x86)
+  - Multi-core processors (2, 4, 8 cores) ⭐ NEW
+  - Cache hierarchy (L1, L2, L3) - ảnh hưởng performance! ⭐ NEW
+  - RAM, Storage (SSD vs HDD)
+• Operating System basics (Windows, macOS, Linux)
+• File system: folders, files, extensions
+• Process vs Applications - quan trọng cho profiling!
+• Task Manager / Activity Monitor:
+  - CPU usage monitoring
+  - Memory usage readings
+  - Understanding processes và threads
+• CPU migrations và core affinity ⭐ NEW`,
+                numPeriods: 2,
+                prerequisite: "",
+                note: "⭐ Enhanced - Nền tảng cho CPU profiling"
+            },
+            {
+                id: 2,
+                chapter: 1,
+                periods: "3-5",
+                title: "Command Line Basics",
+                detail: `• Mở Terminal/Command Prompt
+• Basic commands: cd, ls/dir, pwd, mkdir
+• Navigating directories
+• Creating và deleting files/folders
+• Running programs từ command line
+• Environment variables
+• PATH variable
+• Command history và autocomplete`,
+                numPeriods: 3,
+                prerequisite: "Làm quen với Computer",
+                note: "Rất quan trọng!"
+            },
+            {
+                id: 3,
+                chapter: 1,
+                periods: "6-7",
+                title: "Internet và Networking Basics",
+                detail: `• How internet works
+• IP addresses và DNS
+• URL structure
+• HTTP/HTTPS basics
+• Client-Server model
+• Web browsers và DevTools
+• Download và install software`,
+                numPeriods: 2,
+                prerequisite: "Command Line Basics",
+                note: ""
+            },
+            {
+                id: 4,
+                chapter: 1,
+                periods: "8",
+                title: "Text Editors",
+                detail: `• Notepad++ / VS Code installation
+• Creating và saving text files
+• File encoding (UTF-8)
+• Line endings (LF vs CRLF)
+• Basic text editing
+• Syntax highlighting`,
+                numPeriods: 1,
+                prerequisite: "Internet và Networking Basics",
+                note: ""
+            },
+            {
+                id: 5,
+                chapter: 1,
+                periods: "9-10",
+                title: "What is Programming?",
+                detail: `• Lập trình là gì?
+• Programming languages overview
+• Compiled vs Interpreted languages
+• Source code vs executable
+• Variables và data types concepts
+• Input và output
+• Thuật toán cơ bản
+• Pseudocode`,
+                numPeriods: 2,
+                prerequisite: "Text Editors",
+                note: "Lý thuyết nền tảng"
+            },
+            {
+                id: 6,
+                chapter: 1,
+                periods: "11-13",
+                title: "Logic và Problem Solving",
+                detail: `• Computational thinking
+• Breaking down problems
+• Flowcharts
+• Sequence, Selection, Iteration
+• Boolean logic (AND, OR, NOT)
+• Truth tables
+• Conditional thinking
+• Debugging mindset`,
+                numPeriods: 3,
+                prerequisite: "What is Programming?",
+                note: "Tư duy lập trình"
+            },
+            {
+                id: 7,
+                chapter: 1,
+                periods: "14-15",
+                title: "Data Structures Concepts",
+                detail: `• What is data?
+• Numbers, Text, Boolean
+• Collections concept (lists, arrays)
+• Key-value pairs (maps/dictionaries)
+• Stack và Queue concepts
+• Tree concepts
+• Real-world analogies`,
+                numPeriods: 2,
+                prerequisite: "Logic và Problem Solving",
+                note: ""
+            },
+            {
+                id: 8,
+                chapter: 1,
+                periods: "16-17",
+                title: "Algorithms Basics",
+                detail: `• What is an algorithm?
+• Step-by-step instructions
+• Sorting concepts (bubble sort example)
+• Searching concepts (linear search)
+• Efficiency basics (fast vs slow)
+• Big O notation introduction - cần cho performance!
+• Practice với everyday examples`,
+                numPeriods: 2,
+                prerequisite: "Data Structures Concepts",
+                note: "Important cho performance"
+            },
+            {
+                id: 9,
+                chapter: 1,
+                periods: "18-19",
+                title: "Software Development Basics",
+                detail: `• Software development lifecycle
+• Writing code → Testing → Running
+• Errors và debugging
+• Comments trong code
+• Code organization
+• Version control concepts
+• Collaboration basics`,
+                numPeriods: 2,
+                prerequisite: "Algorithms Basics",
+                note: ""
+            },
+            {
+                id: 10,
+                chapter: 1,
+                periods: "20",
+                title: "Introduction to Testing",
+                detail: `• Why testing matters
+• Manual vs Automated testing
+• What is a bug?
+• Test cases basics
+• Expected vs Actual results
+• Quality assurance role
+• Testing career path`,
+                numPeriods: 1,
+                prerequisite: "Software Development Basics",
+                note: "Testing introduction"
+            },
+            {
+                id: 11,
+                chapter: 1,
+                periods: "21-22",
+                title: "Installing Java JDK",
+                detail: `• Download JDK (OpenJDK hoặc Oracle JDK)
+• Installation steps
+• Setting JAVA_HOME
+• PATH configuration
+• Verify installation (java -version)
+• javac compiler
+• Understanding JRE vs JDK`,
+                numPeriods: 2,
+                prerequisite: "Introduction to Testing",
+                note: "Hands-on setup"
+            },
+            {
+                id: 12,
+                chapter: 1,
+                periods: "23-24",
+                title: "Installing IntelliJ IDEA",
+                detail: `• Download IntelliJ IDEA Community
+• Installation wizard
+• First launch configuration
+• Installing plugins
+• Theme và appearance
+• Keyboard shortcuts introduction
+• Creating first project`,
+                numPeriods: 2,
+                prerequisite: "Installing Java JDK",
+                note: "Main IDE"
+            },
+            {
+                id: 13,
+                chapter: 1,
+                periods: "25",
+                title: "Git Basics for Beginners",
+                detail: `• What is Git và GitHub?
+• Installing Git
+• Git config (name, email)
+• Repository concept
+• Clone một repository
+• Basic workflow: add, commit, push
+• Viewing history
+• GitHub account setup
+• Advanced (for later learning):
+  - git bisect (find regression commits) ⭐ NEW
+  - git rebase (clean history) ⭐ NEW
+  - git stash (save work in progress) ⭐ NEW
+  - git cherry-pick (apply specific commits) ⭐ NEW`,
+                numPeriods: 1,
+                prerequisite: "Installing IntelliJ IDEA",
+                note: "⭐ Enhanced với advanced Git notes"
+            },
+            // CHƯƠNG 2: JAVA FUNDAMENTALS & OOP (30 tiết)
+            {
+                id: 14,
+                chapter: 2,
+                periods: "26-27",
+                title: "Hello World - First Java Program",
+                detail: `• Creating Java project trong IntelliJ
+• Package và class structure
+• main method
+• System.out.println()
+• Compiling và running
+• Understanding errors
+• Practice: multiple print statements`,
+                numPeriods: 2,
+                prerequisite: "Git Basics for Beginners",
+                note: "First program!"
+            },
+            {
+                id: 15,
+                chapter: 2,
+                periods: "28-29",
+                title: "Variables và Data Types",
+                detail: `• Declaring variables
+• int, double, boolean, char, String
+• Naming conventions (camelCase)
+• Assignment operator (=)
+• Initialization
+• Type conversion (casting)
+• final keyword (constants)
+• Practice: calculator basics`,
+                numPeriods: 2,
+                prerequisite: "Hello World - First Java Program",
+                note: ""
+            },
+            {
+                id: 16,
+                chapter: 2,
+                periods: "30-31",
+                title: "Operators và Expressions",
+                detail: `• Arithmetic: +, -, *, /, %
+• Increment/Decrement: ++, --
+• Comparison: ==, !=, >, <, >=, <=
+• Logical: &&, ||, !
+• Operator precedence
+• Practice: conditions và calculations`,
+                numPeriods: 2,
+                prerequisite: "Variables và Data Types",
+                note: ""
+            },
+            {
+                id: 17,
+                chapter: 2,
+                periods: "32",
+                title: "User Input và Scanner",
+                detail: `• Importing Scanner
+• Reading user input
+• nextInt(), nextLine(), nextDouble()
+• Input validation basic
+• Common pitfalls
+• Practice: interactive programs`,
+                numPeriods: 1,
+                prerequisite: "Operators và Expressions",
+                note: ""
+            },
+            {
+                id: 18,
+                chapter: 2,
+                periods: "33-34",
+                title: "Control Flow - If/Else",
+                detail: `• if statement
+• if-else
+• if-else-if ladder
+• Nested if
+• Ternary operator
+• switch statement
+• Practice: decision-making programs`,
+                numPeriods: 2,
+                prerequisite: "User Input và Scanner",
+                note: ""
+            },
+            {
+                id: 19,
+                chapter: 2,
+                periods: "35-36",
+                title: "Loops - For, While",
+                detail: `• for loop structure
+• while loop
+• do-while loop
+• break và continue
+• Nested loops
+• Loop patterns
+• Practice: print patterns, calculations`,
+                numPeriods: 2,
+                prerequisite: "Control Flow - If/Else",
+                note: ""
+            },
+            {
+                id: 20,
+                chapter: 2,
+                periods: "37-38",
+                title: "Arrays - Working with Collections",
+                detail: `• Array declaration và initialization
+• Accessing elements (index)
+• Array length
+• Looping through arrays
+• 2D arrays basics
+• Common array operations
+• Practice: array manipulation`,
+                numPeriods: 2,
+                prerequisite: "Loops - For, While",
+                note: ""
+            },
+            {
+                id: 21,
+                chapter: 2,
+                periods: "39-40",
+                title: "Strings - Text Processing",
+                detail: `• String declaration
+• String concatenation
+• String methods: length(), charAt(), substring()
+• String comparison: equals(), compareTo()
+• StringBuilder basics
+• Practice: text manipulation`,
+                numPeriods: 2,
+                prerequisite: "Arrays - Working with Collections",
+                note: ""
+            },
+            {
+                id: 22,
+                chapter: 2,
+                periods: "41-42",
+                title: "Classes và Objects - Intro",
+                detail: `• What is a class?
+• What is an object?
+• Class definition
+• Fields (attributes)
+• Creating objects (new keyword)
+• Object references
+• Practice: simple class creation`,
+                numPeriods: 2,
+                prerequisite: "Strings - Text Processing",
+                note: "OOP bắt đầu"
+            },
+            {
+                id: 23,
+                chapter: 2,
+                periods: "43-44",
+                title: "Methods - Functions in Classes",
+                detail: `• Method definition
+• Parameters và return types
+• Method calling
+• void methods
+• return keyword
+• Method overloading
+• Practice: utility methods`,
+                numPeriods: 2,
+                prerequisite: "Classes và Objects - Intro",
+                note: ""
+            },
+            {
+                id: 24,
+                chapter: 2,
+                periods: "45-46",
+                title: "Constructors",
+                detail: `• What is a constructor?
+• Default constructor
+• Parameterized constructor
+• Constructor overloading
+• this keyword
+• Practice: initialization`,
+                numPeriods: 2,
+                prerequisite: "Methods - Functions in Classes",
+                note: ""
+            },
+            {
+                id: 25,
+                chapter: 2,
+                periods: "47-48",
+                title: "Encapsulation - Getters/Setters",
+                detail: `• Access modifiers: private, public
+• Encapsulation concept
+• Getters và Setters
+• Data hiding
+• Why encapsulation?
+• Practice: proper class design`,
+                numPeriods: 2,
+                prerequisite: "Constructors",
+                note: "Quan trọng"
+            },
+            {
+                id: 26,
+                chapter: 2,
+                periods: "49-50",
+                title: "Inheritance Basics",
+                detail: `• extends keyword
+• Parent và child classes
+• super keyword
+• Method overriding
+• IS-A relationship
+• Practice: class hierarchy`,
+                numPeriods: 2,
+                prerequisite: "Encapsulation - Getters/Setters",
+                note: ""
+            },
+            {
+                id: 27,
+                chapter: 2,
+                periods: "51-52",
+                title: "Polymorphism và Interfaces",
+                detail: `• Method overriding vs overloading
+• Dynamic dispatch
+• Interface definition
+• implements keyword
+• Multiple interfaces
+• Practice: flexible design`,
+                numPeriods: 2,
+                prerequisite: "Inheritance Basics",
+                note: ""
+            },
+            {
+                id: 28,
+                chapter: 2,
+                periods: "53-54",
+                title: "Exception Handling",
+                detail: `• What are exceptions?
+• try-catch blocks
+• finally block
+• Common exceptions
+• throw và throws
+• Practice: error handling`,
+                numPeriods: 2,
+                prerequisite: "Polymorphism và Interfaces",
+                note: ""
+            },
+            {
+                id: 29,
+                chapter: 2,
+                periods: "55",
+                title: "Collections Framework Basics",
+                detail: `• ArrayList
+• HashMap
+• HashSet
+• When to use what?
+• Basic operations
+• Practice: managing data`,
+                numPeriods: 1,
+                prerequisite: "Exception Handling",
+                note: ""
+            },
+            // CHƯƠNG 3: KOTLIN FUNDAMENTALS (26 tiết)
+            {
+                id: 30,
+                chapter: 3,
+                periods: "56-57",
+                title: "Kotlin Introduction",
+                detail: `• Why Kotlin?
+• Kotlin vs Java
+• Setting up Kotlin
+• Hello World in Kotlin
+• Basic syntax
+• fun keyword
+• main function`,
+                numPeriods: 2,
+                prerequisite: "Collections Framework Basics",
+                note: "New language!"
+            },
+            {
+                id: 31,
+                chapter: 3,
+                periods: "58-59",
+                title: "Variables và Types",
+                detail: `• val vs var
+• Type inference
+• Basic types
+• String templates
+• Nullable types (?)
+• Safe calls (?.)
+• Elvis operator (?:)
+• Practice: Kotlin basics`,
+                numPeriods: 2,
+                prerequisite: "Kotlin Introduction",
+                note: "Null safety!"
+            },
+            {
+                id: 32,
+                chapter: 3,
+                periods: "60-61",
+                title: "Control Flow Kotlin",
+                detail: `• if as expression
+• when expression
+• Ranges (1..10)
+• for loops
+• while loops
+• Practice: Kotlin style`,
+                numPeriods: 2,
+                prerequisite: "Variables và Types",
+                note: ""
+            },
+            {
+                id: 33,
+                chapter: 3,
+                periods: "62-63",
+                title: "Functions Kotlin",
+                detail: `• Function declaration
+• Parameters
+• Default parameters
+• Named arguments
+• Single-expression functions
+• Extension functions
+• Practice: functions`,
+                numPeriods: 2,
+                prerequisite: "Control Flow Kotlin",
+                note: ""
+            },
+            {
+                id: 34,
+                chapter: 3,
+                periods: "64-65",
+                title: "Classes Kotlin",
+                detail: `• Class declaration
+• Primary constructor
+• Properties
+• Data classes
+• init blocks
+• Practice: Kotlin classes`,
+                numPeriods: 2,
+                prerequisite: "Functions Kotlin",
+                note: ""
+            },
+            {
+                id: 35,
+                chapter: 3,
+                periods: "66-67",
+                title: "Collections Kotlin",
+                detail: `• listOf, mutableListOf
+• setOf, mapOf
+• Collection operations
+• map, filter, forEach
+• Lambdas
+• Practice: functional style`,
+                numPeriods: 2,
+                prerequisite: "Classes Kotlin",
+                note: ""
+            },
+            {
+                id: 36,
+                chapter: 3,
+                periods: "68-69",
+                title: "Null Safety Deep Dive",
+                detail: `• Nullable vs Non-nullable
+• !! operator (avoid!)
+• let function
+• Safe casts (as?)
+• Best practices
+• Practice: safe code`,
+                numPeriods: 2,
+                prerequisite: "Collections Kotlin",
+                note: "Critical skill"
+            },
+            {
+                id: 37,
+                chapter: 3,
+                periods: "70-71",
+                title: "OOP in Kotlin",
+                detail: `• Inheritance (open)
+• Override
+• Abstract classes
+• Interfaces
+• object keyword
+• companion object
+• Practice: OOP Kotlin`,
+                numPeriods: 2,
+                prerequisite: "Null Safety Deep Dive",
+                note: ""
+            },
+            {
+                id: 38,
+                chapter: 3,
+                periods: "72-73",
+                title: "Higher-Order Functions",
+                detail: `• Function types
+• Lambda expressions
+• it keyword
+• Trailing lambdas
+• Function references
+• Practice: functional programming`,
+                numPeriods: 2,
+                prerequisite: "OOP in Kotlin",
+                note: ""
+            },
+            {
+                id: 39,
+                chapter: 3,
+                periods: "74-75",
+                title: "Scope Functions",
+                detail: `• let, apply, run, with, also
+• When to use what?
+• Practical examples
+• Practice: idiomatic code`,
+                numPeriods: 2,
+                prerequisite: "Higher-Order Functions",
+                note: "Kotlin style"
+            },
+            {
+                id: 40,
+                chapter: 3,
+                periods: "76-77",
+                title: "Coroutines Basics",
+                detail: `• Why Coroutines? (vs Threads)
+• suspend functions
+• launch vs async vs runBlocking
+• CoroutineScope và CoroutineContext
+• Dispatchers (Main, IO, Default, Unconfined)
+• Structured concurrency
+• Job hierarchy
+• Practice: first coroutines`,
+                numPeriods: 2,
+                prerequisite: "Scope Functions",
+                note: "⭐ CRITICAL cho modern Android"
+            },
+            {
+                id: 41,
+                chapter: 3,
+                periods: "78-79",
+                title: "Coroutines Advanced",
+                detail: `• Flow basics (cold streams)
+• StateFlow vs SharedFlow (hot streams)
+• Flow operators: map, filter, collect
+• Cancellation và timeout
+• withContext() switching
+• Exception handling (try-catch, CoroutineExceptionHandler)
+• Practice: async operations`,
+                numPeriods: 2,
+                prerequisite: "Coroutines Basics",
+                note: "⭐ Flow everywhere!"
+            },
+            {
+                id: 42,
+                chapter: 3,
+                periods: "80-81",
+                title: "Coroutines Performance Implications",
+                detail: `• Thread pool behavior của Dispatchers
+• Context switching overhead
+• Common performance issues:
+  - Blocking Dispatchers.Main
+  - Too many coroutines
+  - Dispatcher.IO saturation
+• Profiling coroutines trong traces
+• Reading coroutine behavior in Perfetto
+• Best practices for performance
+• Practice: optimize coroutine code`,
+                numPeriods: 2,
+                prerequisite: "Coroutines Advanced",
+                note: "⭐ Performance analysis!"
+            },
+            // CHƯƠNG 4: ANDROID BASICS - Hiểu Android Development (29 tiết)
+            {
+                id: 43,
+                chapter: 4,
+                periods: "82-84",
+                title: "Android Introduction",
+                detail: `• What is Android?
+• Android ecosystem
+• Android Studio installation
+• SDK Manager
+• AVD (Emulator) setup
+• First Android app
+• Running on emulator`,
+                numPeriods: 3,
+                prerequisite: "Coroutines Performance Implications",
+                note: "Android bắt đầu"
+            },
+            {
+                id: 44,
+                chapter: 4,
+                periods: "85-86",
+                title: "Android Project Structure",
+                detail: `• app/src/main structure
+• java/kotlin folders
+• res folder (resources)
+• AndroidManifest.xml
+• build.gradle files
+• R.java generated file
+• Understanding project layout`,
+                numPeriods: 2,
+                prerequisite: "Android Introduction",
+                note: ""
+            },
+            {
+                id: 45,
+                chapter: 4,
+                periods: "87-89",
+                title: "Activities và Lifecycle",
+                detail: `• What is an Activity?
+• Activity lifecycle
+• onCreate, onStart, onResume, onPause, onStop, onDestroy
+• Lifecycle methods
+• Configuration changes
+• Practice: lifecycle logging`,
+                numPeriods: 3,
+                prerequisite: "Android Project Structure",
+                note: "Core concept"
+            },
+            {
+                id: 46,
+                chapter: 4,
+                periods: "90-91",
+                title: "UI Basics - XML Layouts",
+                detail: `• XML layout files
+• LinearLayout, RelativeLayout, ConstraintLayout
+• Views: TextView, Button, EditText, ImageView
+• Layout attributes
+• dp vs sp vs px
+• Gravity và layout_gravity
+• Practice: simple UI`,
+                numPeriods: 2,
+                prerequisite: "Activities và Lifecycle",
+                note: ""
+            },
+            {
+                id: 47,
+                chapter: 4,
+                periods: "92-93",
+                title: "Intents và Navigation",
+                detail: `• Explicit Intents
+• Implicit Intents
+• Starting activities
+• Passing data
+• startActivityForResult
+• Practice: multi-screen app`,
+                numPeriods: 2,
+                prerequisite: "UI Basics - XML Layouts",
+                note: ""
+            },
+            {
+                id: 48,
+                chapter: 4,
+                periods: "94-96",
+                title: "RecyclerView - Lists",
+                detail: `• RecyclerView basics
+• Adapter pattern
+• ViewHolder
+• LayoutManager
+• Displaying lists
+• Click handling
+• Practice: list app`,
+                numPeriods: 3,
+                prerequisite: "Intents và Navigation",
+                note: "Important UI"
+            },
+            {
+                id: 49,
+                chapter: 4,
+                periods: "97-98",
+                title: "Data Storage - SharedPreferences",
+                detail: `• SharedPreferences basics
+• Saving simple data
+• Reading data
+• Editor commit/apply
+• PreferenceManager
+• Practice: settings`,
+                numPeriods: 2,
+                prerequisite: "RecyclerView - Lists",
+                note: ""
+            },
+            {
+                id: 50,
+                chapter: 4,
+                periods: "99-101",
+                title: "SQLite Database Basics",
+                detail: `• SQLite introduction
+• SQLiteOpenHelper
+• Creating tables
+• Insert, Query, Update, Delete
+• Cursor usage
+• Practice: simple database`,
+                numPeriods: 3,
+                prerequisite: "Data Storage - SharedPreferences",
+                note: ""
+            },
+            {
+                id: 51,
+                chapter: 4,
+                periods: "102-103",
+                title: "Networking Basics",
+                detail: `• Internet permission
+• HTTP requests
+• Retrofit basics
+• JSON parsing
+• Async operations with coroutines
+• Practice: API call`,
+                numPeriods: 2,
+                prerequisite: "SQLite Database Basics",
+                note: ""
+            },
+            {
+                id: 52,
+                chapter: 4,
+                periods: "104-105",
+                title: "Background Tasks với Coroutines",
+                detail: `• Coroutines in Android
+• lifecycleScope và viewModelScope
+• Dispatchers usage
+• Error handling
+• Practice: background work`,
+                numPeriods: 2,
+                prerequisite: "Networking Basics",
+                note: ""
+            },
+            {
+                id: 53,
+                chapter: 4,
+                periods: "106",
+                title: "Android Architecture - MVVM Introduction",
+                detail: `• MVVM pattern basics
+• ViewModel introduction
+• LiveData basics
+• Repository pattern concept
+• Practice: simple MVVM`,
+                numPeriods: 1,
+                prerequisite: "Background Tasks với Coroutines",
+                note: "Modern Android"
+            },
+            {
+                id: 54,
+                chapter: 4,
+                periods: "107-108",
+                title: "Android Architecture Patterns Deep Dive",
+                detail: `• MVVM vs MVC vs MVP comparison
+• Why architecture matters for PERFORMANCE
+• Separation of concerns
+• Testability benefits
+• Memory management in architecture
+• Lifecycle-aware components
+• ViewModel vs Activity/Fragment scope
+• Common architecture mistakes
+• Practice: refactor to MVVM`,
+                numPeriods: 2,
+                prerequisite: "Android Architecture - MVVM Introduction",
+                note: "⭐ Performance foundation"
+            },
+            {
+                id: 55,
+                chapter: 4,
+                periods: "109-110",
+                title: "Common Performance Anti-patterns",
+                detail: `• Memory leaks từ Context references:
+  - Static Context references
+  - Inner class references
+  - Handler leaks
+  - Listener leaks (không unregister)
+• Heavy operations on Main thread:
+  - Network on main thread
+  - Database on main thread
+  - File I/O on main thread
+  - Bitmap decoding on main thread
+• ANR causes:
+  - Blocking main thread
+  - Broadcast receiver timeout
+  - Service timeout
+• RecyclerView anti-patterns:
+  - Creating objects in onBindViewHolder
+  - Nested RecyclerView
+  - Not using ViewHolder pattern
+• Practice: identify và fix anti-patterns`,
+                numPeriods: 2,
+                prerequisite: "Android Architecture Patterns Deep Dive",
+                note: "⭐ CRITICAL - học cái GÌ LÀ BAD!"
+            },
+            // CHƯƠNG 5: TESTING FUNDAMENTALS (35 tiết)
+            {
+                id: 56,
+                chapter: 5,
+                periods: "111-112",
+                title: "Software Testing Introduction",
+                detail: `• Why testing?
+• Manual vs Automated
+• Types of testing
+• Test pyramid
+• Unit, Integration, UI tests
+• TDD basics
+• Testing mindset`,
+                numPeriods: 2,
+                prerequisite: "Common Performance Anti-patterns",
+                note: "Testing begins"
+            },
+            {
+                id: 57,
+                chapter: 5,
+                periods: "113-114",
+                title: "JUnit Basics",
+                detail: `• JUnit 5 setup
+• @Test annotation
+• Assertions: assertEquals, assertTrue, assertFalse
+• Test structure (AAA pattern)
+• Running tests
+• Practice: first unit tests`,
+                numPeriods: 2,
+                prerequisite: "Software Testing Introduction",
+                note: ""
+            },
+            {
+                id: 58,
+                chapter: 5,
+                periods: "115-116",
+                title: "Writing Good Tests",
+                detail: `• Test naming
+• One assertion per test?
+• Test independence
+• Test data
+• Readability
+• Maintainability
+• Practice: quality tests`,
+                numPeriods: 2,
+                prerequisite: "JUnit Basics",
+                note: ""
+            },
+            {
+                id: 59,
+                chapter: 5,
+                periods: "117-118",
+                title: "Mocking Introduction",
+                detail: `• What is mocking?
+• Why mock?
+• Mockito basics
+• @Mock annotation
+• when().thenReturn()
+• verify()
+• Practice: mocking`,
+                numPeriods: 2,
+                prerequisite: "Writing Good Tests",
+                note: ""
+            },
+            {
+                id: 60,
+                chapter: 5,
+                periods: "119-120",
+                title: "Kotlin Testing - Kotest",
+                detail: `• Kotest framework
+• StringSpec
+• Test styles
+• shouldBe assertions
+• Practice: Kotlin tests`,
+                numPeriods: 2,
+                prerequisite: "Mocking Introduction",
+                note: ""
+            },
+            {
+                id: 61,
+                chapter: 5,
+                periods: "121-123",
+                title: "Android Local Unit Tests",
+                detail: `• test/ vs androidTest/ folders
+• Testing ViewModels
+• Testing repositories
+• Testing utilities
+• Robolectric introduction
+• Practice: Android unit tests`,
+                numPeriods: 3,
+                prerequisite: "Kotlin Testing - Kotest",
+                note: ""
+            },
+            {
+                id: 62,
+                chapter: 5,
+                periods: "124-126",
+                title: "Espresso Basics",
+                detail: `• Espresso framework
+• onView() matcher
+• ViewMatchers
+• ViewActions: click, typeText
+• ViewAssertions
+• Practice: simple UI tests`,
+                numPeriods: 3,
+                prerequisite: "Android Local Unit Tests",
+                note: "UI testing"
+            },
+            {
+                id: 63,
+                chapter: 5,
+                periods: "127-129",
+                title: "Espresso Advanced",
+                detail: `• RecyclerView testing
+• Idling Resources
+• Intent testing
+• Custom matchers
+• Practice: complex UI tests`,
+                numPeriods: 3,
+                prerequisite: "Espresso Basics",
+                note: ""
+            },
+            {
+                id: 64,
+                chapter: 5,
+                periods: "130-131",
+                title: "Test Debugging",
+                detail: `• Debugging tests
+• Test failures analysis
+• Flaky tests
+• Test logs
+• Screenshots
+• Practice: debugging`,
+                numPeriods: 2,
+                prerequisite: "Espresso Advanced",
+                note: ""
+            },
+            {
+                id: 65,
+                chapter: 5,
+                periods: "132-133",
+                title: "Testing Best Practices",
+                detail: `• Test organization
+• Test naming conventions
+• Test data management
+• CI/CD basics
+• Code coverage
+• Practice: professional tests`,
+                numPeriods: 2,
+                prerequisite: "Test Debugging",
+                note: ""
+            },
+            {
+                id: 66,
+                chapter: 5,
+                periods: "134-135",
+                title: "End-to-End Testing Intro",
+                detail: `• E2E testing concept
+• User flows
+• Test scenarios
+• Automation strategy
+• Practice: E2E tests`,
+                numPeriods: 2,
+                prerequisite: "Testing Best Practices",
+                note: ""
+            },
+            {
+                id: 67,
+                chapter: 5,
+                periods: "136-137",
+                title: "REST API Basics",
+                detail: `• HTTP methods
+• Status codes
+• Request/Response
+• JSON format
+• Postman tool
+• Practice: API exploration`,
+                numPeriods: 2,
+                prerequisite: "End-to-End Testing Intro",
+                note: ""
+            },
+            {
+                id: 68,
+                chapter: 5,
+                periods: "138-139",
+                title: "API Testing with RestAssured",
+                detail: `• RestAssured library
+• GET, POST requests
+• Response validation
+• JSON path
+• Practice: API tests`,
+                numPeriods: 2,
+                prerequisite: "REST API Basics",
+                note: ""
+            },
+            {
+                id: 69,
+                chapter: 5,
+                periods: "140-141",
+                title: "Database Testing",
+                detail: `• Testing database operations
+• Test data setup và teardown
+• Database assertions
+• Transaction rollback strategies
+• Performance-focused testing: ⭐ NEW
+  - Query performance validation
+  - Index effectiveness testing
+  - Explain query plans (SQLite .explain)
+  - Connection pool testing
+  - Batch vs single operations
+• Practice: database tests with performance checks`,
+                numPeriods: 2,
+                prerequisite: "API Testing with RestAssured",
+                note: "⭐ Enhanced - Performance focus"
+            },
+            {
+                id: 70,
+                chapter: 5,
+                periods: "142-143",
+                title: "Integration Testing",
+                detail: `• What is integration testing?
+• Testing components together
+• TestContainers intro
+• Practice: integration tests`,
+                numPeriods: 2,
+                prerequisite: "Database Testing",
+                note: ""
+            },
+            {
+                id: 71,
+                chapter: 5,
+                periods: "144-145",
+                title: "Mock Servers",
+                detail: `• WireMock basics
+• Stubbing APIs
+• Testing offline
+• Practice: mock API`,
+                numPeriods: 2,
+                prerequisite: "Integration Testing",
+                note: ""
+            },
+            // CHƯƠNG 6: ANDROID PROFILING & PERFORMANCE ANALYSIS (50 tiết)
+            {
+                id: 72,
+                chapter: 6,
+                periods: "146-147",
+                title: "Android Profiler Overview",
+                detail: `• Profiler suite introduction
+• Profiler window layout
+• Session management (save/load)
+• Live vs recorded profiling
+• Baseline profiling
+• Export sessions
+• Real device vs Emulator considerations
+• Practice: first profiling session`,
+                numPeriods: 2,
+                prerequisite: "Mock Servers",
+                note: "Profiling begins!"
+            },
+            {
+                id: 73,
+                chapter: 6,
+                periods: "148-150",
+                title: "CPU Profiler - Basics",
+                detail: `• CPU Profiler interface
+• Recording CPU activity
+• Call Chart view (timeline)
+• Flame Chart view (aggregated)
+• Method tracing modes:
+  - Sample-based (low overhead)
+  - Instrumented (accurate but slower)
+• Thread selection
+• Practice: profile simple app`,
+                numPeriods: 3,
+                prerequisite: "Android Profiler Overview",
+                note: ""
+            },
+            {
+                id: 74,
+                chapter: 6,
+                periods: "151-153",
+                title: "CPU Profiler - Advanced Analysis",
+                detail: `• Top Down tree analysis
+• Bottom Up tree analysis
+• Finding hot paths (most time spent)
+• Thread analysis (state: running/sleeping/waiting)
+• Main thread bottleneck identification
+• Background thread analysis
+• Native method profiling
+• Practice: optimize slow methods`,
+                numPeriods: 3,
+                prerequisite: "CPU Profiler - Basics",
+                note: "Deep dive"
+            },
+            {
+                id: 75,
+                chapter: 6,
+                periods: "154-156",
+                title: "Memory Profiler",
+                detail: `• Memory Profiler interface
+• Live memory tracking
+• Heap dump capture và analysis
+• Allocation tracking
+• Memory leak detection patterns:
+  - Static references
+  - Handler leaks
+  - Listener leaks
+  - Inner class leaks
+• Garbage collection events
+• Shallow vs Retained size
+• Native memory tracking
+• Bitmap memory analysis
+• Practice: find và fix memory leaks`,
+                numPeriods: 3,
+                prerequisite: "CPU Profiler - Advanced Analysis",
+                note: "Memory critical"
+            },
+            {
+                id: 76,
+                chapter: 6,
+                periods: "157-158",
+                title: "Network Profiler",
+                detail: `• Network Profiler interface
+• HTTP request/response inspection
+• Request timeline
+• Network traffic analysis
+• Response body viewer (JSON, HTML)
+• Connection tracking
+• TLS/SSL handshake analysis
+• Network performance metrics
+• Practice: optimize network calls`,
+                numPeriods: 2,
+                prerequisite: "Memory Profiler",
+                note: ""
+            },
+            {
+                id: 77,
+                chapter: 6,
+                periods: "159-160",
+                title: "Energy Profiler",
+                detail: `• Energy Profiler overview
+• Battery consumption tracking
+• Wake locks detection
+• Location requests monitoring
+• Network activity battery impact
+• CPU usage battery impact
+• Background job monitoring
+• Battery optimization best practices
+• Practice: reduce battery drain`,
+                numPeriods: 2,
+                prerequisite: "Network Profiler",
+                note: ""
+            },
+            {
+                id: 78,
+                chapter: 6,
+                periods: "161-162",
+                title: "Perfetto Introduction",
+                detail: `• What is Perfetto? (next-gen systrace)
+• System-level tracing
+• Perfetto UI interface tour
+• Trace data sources
+• Recording methods overview
+• Perfetto vs old Systrace
+• When to use Perfetto vs Profilers
+• Practice: open sample trace`,
+                numPeriods: 2,
+                prerequisite: "Energy Profiler",
+                note: "Powerful tool!"
+            },
+            {
+                id: 79,
+                chapter: 6,
+                periods: "163-165",
+                title: "Recording Perfetto Traces",
+                detail: `• Recording via Android Studio (easy)
+• Recording via adb shell perfetto
+• Recording via Perfetto UI (advanced)
+• Custom trace configs
+• Trace categories selection:
+  - sched (CPU scheduling)
+  - freq (CPU frequency)
+  - am (Activity Manager)
+  - wm (Window Manager)
+  - gfx (Graphics)
+  - view (View system)
+  - webview, dalvik, etc.
+• Buffer size configuration
+• Long-running traces (minutes/hours)
+• Triggered traces (on event)
+• App startup tracing
+• Practice: record different scenarios`,
+                numPeriods: 3,
+                prerequisite: "Perfetto Introduction",
+                note: ""
+            },
+            {
+                id: 80,
+                chapter: 6,
+                periods: "166-167",
+                title: "Perfetto UI Navigation & Analysis",
+                detail: `• Timeline overview và controls
+• Track organization (process, thread, counter)
+• Thread states visualization (Running, Runnable, Sleeping, Blocked)
+• CPU scheduling tracks
+• Zooming và panning efficiently
+• Time range selection
+• Track pinning
+• Search functionality (regex)
+• SQL queries trong Perfetto!
+• Practice: navigate complex traces`,
+                numPeriods: 2,
+                prerequisite: "Recording Perfetto Traces",
+                note: ""
+            },
+            {
+                id: 81,
+                chapter: 6,
+                periods: "168-170",
+                title: "System-Level Trace Analysis",
+                detail: `• CPU scheduling deep dive:
+  - Thread states (R, S, D, Z)
+  - Runnable but not running (CPU contention)
+  - Sleep reasons (futex, pipe, etc.)
+• CPU frequency và idle states (C-states)
+• CPU migrations between cores
+• Scheduler latency analysis
+• Context switches overhead
+• IRQ và SoftIRQ analysis
+• CPU utilization patterns
+• Per-core analysis
+• Practice: analyze CPU bottlenecks`,
+                numPeriods: 3,
+                prerequisite: "Perfetto UI Navigation & Analysis",
+                note: "System-level deep"
+            },
+            {
+                id: 82,
+                chapter: 6,
+                periods: "171-173",
+                title: "Frame Rendering Analysis",
+                detail: `• Frame rendering pipeline overview:
+  - Input → Animation → Measure/Layout → Draw → Submit
+• VSYNC signals (16.6ms @ 60fps)
+• Frame drops analysis (janky frames)
+• Choreographer doFrame() analysis
+• UI thread vs RenderThread
+• GPU rendering (HWC composition)
+• Surfaceflinger analysis
+• Display pipeline
+• Triple buffering
+• Practice: eliminate frame drops`,
+                numPeriods: 3,
+                prerequisite: "System-Level Trace Analysis",
+                note: "UI performance"
+            },
+            {
+                id: 83,
+                chapter: 6,
+                periods: "174-176",
+                title: "Advanced Trace Analysis - Query Detection ⭐",
+                detail: `• SQL queries trong Perfetto (powerful!)
+• Writing custom queries
+• Query-in-loop detection patterns:
+  - Database query patterns
+  - ContentProvider repeated queries
+  - N+1 query problems
+• Binder transaction analysis:
+  - Cross-process communication
+  - Binder thread pool
+  - Transaction overhead
+• IPC performance analysis
+• Broadcast analysis (ordered vs unordered)
+• Service binding overhead
+• Practice: find query-in-loop bugs`,
+                numPeriods: 3,
+                prerequisite: "Frame Rendering Analysis",
+                note: "⭐ Advanced skill!"
+            },
+            {
+                id: 84,
+                chapter: 6,
+                periods: "177-178",
+                title: "Custom Tracing - Instrumentation",
+                detail: `• Adding custom trace points
+• Trace.beginSection() / Trace.endSection()
+• Custom trace markers
+• Async traces (beginAsyncSection)
+• Counter tracks (setCounter)
+• Tracing best practices:
+  - Granularity balance
+  - Performance overhead (<1%)
+  - Naming conventions
+• Trace in production (safe)
+• TraceCompat for API compatibility
+• Practice: instrument your code`,
+                numPeriods: 2,
+                prerequisite: "Advanced Trace Analysis - Query Detection",
+                note: ""
+            },
+            {
+                id: 85,
+                chapter: 6,
+                periods: "179-180",
+                title: "Perfetto Case Studies ⭐",
+                detail: `• Case Study 1: Slow RecyclerView Scrolling
+  - Analyzing scroll jank
+  - Finding inflation overhead
+  - Bitmap loading issues
+  - Solution implementation
+• Case Study 2: Memory Allocation Hotspots
+  - Finding excessive allocations
+  - GC pressure analysis
+  - Object pooling solution
+• Case Study 3: Frame Drops in Animation
+  - Choreographer analysis
+  - Layout/measure overhead
+  - Overdraw detection
+• Case Study 4: Network-induced Jank
+  - Main thread network calls
+  - Binder transaction delays
+• Case Study 5: Database Query-in-Loop (Real Example!)
+  - Detecting N+1 queries
+  - SQL trace analysis
+  - Batch query solution
+• Practice: analyze provided trace samples`,
+                numPeriods: 2,
+                prerequisite: "Custom Tracing - Instrumentation",
+                note: "⭐ Real-world scenarios!"
+            },
+            {
+                id: 86,
+                chapter: 6,
+                periods: "181-182",
+                title: "ANR (Application Not Responding) Analysis",
+                detail: `• ANR basics và common causes
+• Main thread blocking detection
+• ANR traces reading (/data/anr/)
+• Bugreport analysis (adb bugreport)
+• StrictMode for proactive detection:
+  - detectDiskReads(), detectDiskWrites()
+  - detectNetwork()
+  - detectCustomSlowCalls()
+• Background ANRs (API 26+)
+• Input dispatching timeout (5s)
+• Broadcast timeout (10s foreground, 60s background)
+• Service timeout (20s foreground, 200s background)
+• Practice: debug và fix ANRs`,
+                numPeriods: 2,
+                prerequisite: "Perfetto Case Studies",
+                note: "Production critical"
+            },
+            {
+                id: 87,
+                chapter: 6,
+                periods: "183-185",
+                title: "Startup Performance Analysis",
+                detail: `• Cold start vs Warm start vs Hot start
+• Application startup flow:
+  - Process creation
+  - Application.onCreate()
+  - Activity creation
+  - Layout inflation
+  - First draw
+• Time to Initial Display (TTID)
+• Time to Full Display (TTFD)
+• Reportfully drawn API
+• Startup trace analysis với Perfetto
+• Lazy initialization patterns
+• Baseline profiles (ART optimization)
+• Content providers initialization overhead
+• App startup best practices
+• Practice: optimize app startup`,
+                numPeriods: 3,
+                prerequisite: "ANR (Application Not Responding) Analysis",
+                note: "User experience critical"
+            },
+            {
+                id: 88,
+                chapter: 6,
+                periods: "186-187",
+                title: "Memory Performance Deep Dive",
+                detail: `• Java heap vs Native heap
+• Memory categories breakdown:
+  - Java heap
+  - Native heap
+  - Code (DEX, SO)
+  - Stack
+  - Graphics (textures, surfaces)
+  - Private Other
+• Memory churn analysis
+• Allocation tracking strategies
+• Memory regression testing
+• OOM (Out of Memory) debugging
+• Low memory killer (LMK)
+• Memory profiling automation
+• LeakCanary integration và usage
+• Practice: optimize memory usage`,
+                numPeriods: 2,
+                prerequisite: "Startup Performance Analysis",
+                note: ""
+            },
+            {
+                id: 89,
+                chapter: 6,
+                periods: "188-189",
+                title: "Graphics & Rendering Performance",
+                detail: `• GPU overdraw analysis:
+  - Debug GPU overdraw tool
+  - 4x overdraw = red (bad!)
+  - Optimization strategies
+• Rendering performance metrics
+• Hardware acceleration
+• View invalidation patterns (minimize)
+• Canvas drawing performance
+• Bitmap usage optimization:
+  - inSampleSize
+  - RGB_565 vs ARGB_8888
+  - Bitmap pooling
+• Vector drawables performance
+• Lottie animation profiling
+• Custom view optimization
+• Practice: smooth 60fps rendering`,
+                numPeriods: 2,
+                prerequisite: "Memory Performance Deep Dive",
+                note: "UI smoothness"
+            },
+            {
+                id: 90,
+                chapter: 6,
+                periods: "190-191",
+                title: "I/O & Storage Performance",
+                detail: `• Disk I/O analysis trong traces
+• File access patterns
+• SharedPreferences performance:
+  - commit() vs apply()
+  - Main thread blocking
+  - Multi-process issues
+• Database query optimization:
+  - Index usage
+  - Query planning
+  - Batch operations
+  - VACUUM
+• Storage profiling
+• Background I/O detection
+• MainThread I/O violations (StrictMode)
+• Storage Access Framework overhead
+• Practice: optimize I/O operations`,
+                numPeriods: 2,
+                prerequisite: "Graphics & Rendering Performance",
+                note: ""
+            },
+            {
+                id: 91,
+                chapter: 6,
+                periods: "192",
+                title: "Network Performance Analysis",
+                detail: `• Network latency analysis
+• Request batching strategies
+• Caching strategies (HTTP cache, custom)
+• Connection pooling (OkHttp)
+• API response time optimization
+• Payload size optimization (gzip, minification)
+• Network quality impact (2G/3G/4G/5G/WiFi)
+• Offline-first architecture analysis
+• Prefetching strategies
+• Practice: optimize network performance`,
+                numPeriods: 1,
+                prerequisite: "I/O & Storage Performance",
+                note: ""
+            },
+            {
+                id: 92,
+                chapter: 6,
+                periods: "193-194",
+                title: "Performance Testing Environment & Scenarios ⭐",
+                detail: `• Real device vs Emulator:
+  - Performance differences
+  - When to use each
+  - USB debugging impact
+• Device fragmentation testing:
+  - Low-end devices (1-2GB RAM)
+  - Mid-range devices
+  - High-end devices
+  - Different Android versions
+• Performance variance factors:
+  - Background processes
+  - Battery saver mode
+  - Low memory situations
+• Test device selection strategy
+• Reproducible performance scenarios:
+  - Controlled environment
+  - Airplane mode
+  - Fixed CPU frequency
+• Performance test automation
+• Practice: setup performance test lab`,
+                numPeriods: 2,
+                prerequisite: "Network Performance Analysis",
+                note: "⭐ Professional setup"
+            },
+            {
+                id: 93,
+                chapter: 6,
+                periods: "195",
+                title: "Performance Regression Detection ⭐",
+                detail: `• Establishing performance baselines
+• Automated performance testing:
+  - Macrobenchmark for app-level
+  - Microbenchmark for code-level
+• CI/CD integration:
+  - Firebase Test Lab
+  - GitHub Actions performance tests
+• Performance budgets:
+  - Startup time < 2s
+  - Frame time < 16ms
+  - Memory < threshold
+  - APK size limits
+• Regression detection strategies
+• Performance dashboards
+• Alerting on regressions
+• Practice: implement performance CI`,
+                numPeriods: 1,
+                prerequisite: "Performance Testing Environment & Scenarios",
+                note: "⭐ Continuous monitoring"
+            },
+            // CHƯƠNG 7: ADVANCED TESTING & ANALYSIS (37 tiết)
+            {
+                id: 94,
+                chapter: 7,
+                periods: "196-198",
+                title: "Performance Testing - Benchmarking",
+                detail: `• Microbenchmark Library (method-level): ⭐ RESTRUCTURED
+  - Setup và configuration
+  - @Benchmark annotation
+  - Warmup iterations (JIT compilation)
+  - Allocation tracking mode
+  - Result interpretation
+  - When to use: tight loops, algorithms
+• Macrobenchmark Library (app-level): ⭐ RESTRUCTURED
+  - App startup benchmarking (cold/warm/hot)
+  - Scroll/animation benchmarking (jank metrics)
+  - Custom user journey scenarios
+  - CompilationMode (None, Partial, Full)
+  - When to use: user-facing performance
+• Baseline Profiles: ⭐ RESTRUCTURED
+  - What are baseline profiles? (ART optimization)
+  - Generation process (macrobenchmark)
+  - Distribution via Play Store
+  - Performance impact measurement (30-40% faster startup!)
+  - Integration with build process
+• Practice: benchmark critical app paths`,
+                numPeriods: 3,
+                prerequisite: "Performance Regression Detection",
+                note: "⭐ Enhanced - 3 separate topics!"
+            },
+            {
+                id: 95,
+                chapter: 7,
+                periods: "199-200",
+                title: "Security Testing Basics",
+                detail: `• Android security model overview
+• App permissions testing
+• Intent security (exported components)
+• Data storage security:
+  - SharedPreferences encryption
+  - Database encryption
+  - File encryption
+• Certificate pinning testing
+• Root detection testing
+• Reverse engineering prevention
+• ProGuard/R8 analysis
+• Practice: security audit`,
+                numPeriods: 2,
+                prerequisite: "Performance Testing - Benchmarking",
+                note: ""
+            },
+            {
+                id: 96,
+                chapter: 7,
+                periods: "201-203",
+                title: "UI Testing Advanced",
+                detail: `• Jetpack Compose testing:
+  - Compose test APIs
+  - Semantics tree
+  - State testing
+• Screenshot testing (compare images)
+• Accessibility testing:
+  - TalkBack testing
+  - Content descriptions
+  - Touch target sizes
+• Cross-device testing
+• Practice: comprehensive UI tests`,
+                numPeriods: 3,
+                prerequisite: "Security Testing Basics",
+                note: ""
+            },
+            {
+                id: 97,
+                chapter: 7,
+                periods: "204-205",
+                title: "Test Automation Framework Design",
+                detail: `• Framework architecture
+• Page Object Model (POM)
+• Test data management strategies
+• Reusable test components
+• Custom test libraries
+• Reporting framework
+• Scalability considerations
+• Practice: build test framework`,
+                numPeriods: 2,
+                prerequisite: "UI Testing Advanced",
+                note: ""
+            },
+            {
+                id: 98,
+                chapter: 7,
+                periods: "206-207",
+                title: "CI/CD for Android Testing",
+                detail: `• GitHub Actions for Android
+• Automated test execution
+• Test sharding (parallel)
+• Test result reporting
+• Firebase Test Lab integration
+• Artifact management
+• Failure notifications (Slack, email)
+• Practice: complete CI/CD pipeline`,
+                numPeriods: 2,
+                prerequisite: "Test Automation Framework Design",
+                note: ""
+            },
+            {
+                id: 99,
+                chapter: 7,
+                periods: "208-209",
+                title: "Static Analysis - General",
+                detail: `• Android Lint deep dive
+• Custom Lint rules creation
+• SonarQube for Android
+• CheckStyle, PMD, SpotBugs
+• Code quality metrics:
+  - Cyclomatic complexity
+  - Code duplication
+  - Code smells
+• Technical debt analysis
+• Practice: static analysis setup`,
+                numPeriods: 2,
+                prerequisite: "CI/CD for Android Testing",
+                note: ""
+            },
+            {
+                id: 100,
+                chapter: 7,
+                periods: "210",
+                title: "Performance Static Analysis ⭐",
+                detail: `• Android Lint performance checks:
+  - Recycle, Wakelock, DrawAllocation, etc.
+• StrictMode policies:
+  - Thread policy (detect network, disk)
+  - VM policy (detect leaks, closeable)
+• LeakCanary setup và configuration:
+  - Detecting memory leaks
+  - Leak traces analysis
+  - Custom leak detection
+• Performance annotations:
+  - @UiThread, @WorkerThread
+  - @MainThread, @BinderThread
+  - Custom annotations
+• Static analysis in CI/CD
+• Practice: catch performance issues early`,
+                numPeriods: 1,
+                prerequisite: "Static Analysis - General",
+                note: "⭐ Proactive detection"
+            },
+            {
+                id: 101,
+                chapter: 7,
+                periods: "211-212",
+                title: "Code Coverage Analysis",
+                detail: `• JaCoCo for Android setup
+• Coverage types:
+  - Line coverage
+  - Branch coverage
+  - Method coverage
+• Coverage reports generation
+• Unit test coverage
+• Instrumentation test coverage
+• Combined coverage
+• Coverage thresholds in CI
+• Practice: improve coverage`,
+                numPeriods: 2,
+                prerequisite: "Performance Static Analysis",
+                note: ""
+            },
+            {
+                id: 102,
+                chapter: 7,
+                periods: "213-214",
+                title: "APK Analysis & Optimization",
+                detail: `• APK Analyzer tool:
+  - APK structure
+  - Size breakdown
+  - DEX file analysis
+• APK size optimization:
+  - ProGuard/R8 (code shrinking)
+  - Resource shrinking
+  - Compression
+  - Remove unused resources
+• Compare APKs (before/after)
+• Download size optimization
+• Practice: reduce APK size`,
+                numPeriods: 2,
+                prerequisite: "Code Coverage Analysis",
+                note: ""
+            },
+            {
+                id: 103,
+                chapter: 7,
+                periods: "215-216",
+                title: "Architecture Analysis & Validation",
+                detail: `• Android architecture patterns validation
+• ArchUnit for Android:
+  - Layer dependency rules
+  - Package dependency rules
+  - Naming conventions
+• Module dependencies analysis
+• Circular dependency detection
+• Design pattern detection
+• Clean Architecture validation
+• Practice: architecture tests`,
+                numPeriods: 2,
+                prerequisite: "APK Analysis & Optimization",
+                note: ""
+            },
+            {
+                id: 104,
+                chapter: 7,
+                periods: "217-218",
+                title: "Binary Analysis & Reverse Engineering",
+                detail: `• APK decompilation tools:
+  - jadx (DEX to Java)
+  - apktool (resources)
+• DEX file structure
+• Smali code basics
+• Native library analysis (.so files)
+• Security analysis via RE
+• Obfuscation analysis (ProGuard/R8)
+• Anti-tampering checks
+• Practice: analyze obfuscated APK`,
+                numPeriods: 2,
+                prerequisite: "Architecture Analysis & Validation",
+                note: "Advanced"
+            },
+            {
+                id: 105,
+                chapter: 7,
+                periods: "219-220",
+                title: "Android Test Strategy Development",
+                detail: `• Test pyramid for Android apps
+• Local vs Instrumented test balance
+• Test suite optimization (speed vs coverage)
+• Test organization best practices
+• Flaky test handling strategies
+• Test maintenance guidelines
+• Risk-based testing approach
+• Test documentation standards
+• Practice: create test strategy doc`,
+                numPeriods: 2,
+                prerequisite: "Binary Analysis & Reverse Engineering",
+                note: ""
+            },
+            {
+                id: 106,
+                chapter: 7,
+                periods: "221-222",
+                title: "Bug Reporting & Issue Management",
+                detail: `• JIRA for bug tracking
+• Bug lifecycle (New → In Progress → Resolved → Closed)
+• Writing excellent bug reports:
+  - Steps to reproduce
+  - Expected vs Actual
+  - Screenshots/videos
+  - Logs và traces
+  - Device information
+• Severity vs Priority matrix
+• Root cause analysis techniques
+• Regression testing process
+• Practice: file comprehensive bugs`,
+                numPeriods: 2,
+                prerequisite: "Android Test Strategy Development",
+                note: ""
+            },
+            {
+                id: 107,
+                chapter: 7,
+                periods: "223-224",
+                title: "Performance Metrics & KPIs ⭐",
+                detail: `• Performance KPIs definition:
+  - Frame rate targets (60fps, 90fps, 120fps)
+  - App startup time benchmarks (cold < 2s, warm < 1s)
+  - Memory usage thresholds (by device tier)
+  - ANR rate targets (< 0.5%)
+  - Crash rate targets (< 1%)
+  - Battery consumption limits
+• Industry standards (Google Play Vitals):
+  - Bad behavior thresholds
+  - Peer comparison
+• Quality dashboards:
+  - Firebase Crashlytics
+  - Play Console vitals
+  - Custom dashboards (Grafana)
+• Reporting strategies
+• SLA monitoring
+• Practice: define performance SLAs`,
+                numPeriods: 2,
+                prerequisite: "Bug Reporting & Issue Management",
+                note: "⭐ Metrics-driven"
+            },
+            {
+                id: 108,
+                chapter: 7,
+                periods: "225-226",
+                title: "Working with Development Team ⭐",
+                detail: `• Technical communication skills:
+  - Explaining performance issues to developers
+  - Root cause analysis presentations
+  - Performance impact quantification
+• Reproducing issues effectively:
+  - Minimal reproduction steps
+  - Environment details
+  - Traces và profiles attached
+• Performance regression reports:
+  - Before/after comparison
+  - Bisecting to find culprit commit (git bisect!) ⭐ NEW
+  - Impact assessment
+• Prioritization collaboration:
+  - P0 (critical) vs P1/P2/P3
+  - Impact vs effort matrix
+• Building performance culture:
+  - Brown bag sessions
+  - Performance reviews
+  - Best practices documentation
+• Practice: present performance findings`,
+                numPeriods: 2,
+                prerequisite: "Performance Metrics & KPIs",
+                note: "⭐ Collaboration critical"
+            },
+            {
+                id: 109,
+                chapter: 7,
+                periods: "227-228",
+                title: "Continuous Learning & Career Development",
+                detail: `• Android performance evolution:
+  - ART improvements
+  - New profiling tools
+  - Platform optimizations
+• Industry best practices sources:
+  - Android Performance Patterns (YouTube)
+  - Google I/O sessions
+  - Android Dev Summit
+• Community resources:
+  - Android Performance subreddit
+  - Performance blogs (Medium, dev.to)
+  - Open source projects to study
+• Building portfolio:
+  - GitHub projects
+  - Technical blog posts
+  - Speaking at meetups
+• Networking:
+  - LinkedIn optimization
+  - Tech communities
+  - Conferences
+• Career path:
+  - Junior → Mid → Senior → Staff/Principal
+  - Performance Engineer roles
+  - Consulting opportunities
+• Your competitive advantages:
+  - Perfetto expertise (rare!)
+  - Testing + Performance combination
+  - System-level understanding
+• Practice: create learning roadmap`,
+                numPeriods: 2,
+                prerequisite: "Working with Development Team",
+                note: "Career growth!"
+            },
+            {
+                id: 110,
+                chapter: 7,
+                periods: "229-230",
+                title: "JNI Performance Analysis",
+                detail: `• JNI (Java Native Interface) basics:
+  - What is JNI?
+  - When to use native code
+  - JNI overhead
+• JNI call performance:
+  - Call overhead measurement
+  - Batch JNI calls
+  - Avoiding frequent crossing
+• Common JNI performance issues:
+  - Excessive JNI calls
+  - String conversions overhead
+  - Array copying
+  - Local reference management
+• Profiling native code:
+  - Simpleperf tool
+  - Native method tracing
+• Practice: optimize JNI calls`,
+                numPeriods: 2,
+                prerequisite: "Continuous Learning & Career Development",
+                note: "⭐ Native layer"
+            },
+            {
+                id: 111,
+                chapter: 7,
+                periods: "231-232",
+                title: "Native Memory & Debugging Tools",
+                detail: `• Native heap vs Java heap separation
+• Native memory allocation tracking
+• Tools for native debugging:
+  - simpleperf (Linux perf for Android)
+  - Address Sanitizer (ASan)
+  - Memory Sanitizer (MSan)
+• Reading native crash dumps:
+  - Stack traces from tombstone
+  - Symbol resolution
+• Native memory leaks detection
+• NDK profiling
+• Common native issues:
+  - Memory corruption
+  - Use-after-free
+  - Buffer overflows
+• Practice: debug native crashes`,
+                numPeriods: 2,
+                prerequisite: "JNI Performance Analysis",
+                note: "⭐ Advanced debugging"
+            }
+        ];
+
+        const chapters = [
+            { id: 1, name: "CHƯƠNG 1: ABSOLUTE BEGINNER - Kiến thức nền tảng", totalPeriods: 25 },
+            { id: 2, name: "CHƯƠNG 2: JAVA FUNDAMENTALS & OOP", totalPeriods: 30 },
+            { id: 3, name: "CHƯƠNG 3: KOTLIN FUNDAMENTALS", totalPeriods: 26 },
+            { id: 4, name: "CHƯƠNG 4: ANDROID BASICS - Hiểu Android Development", totalPeriods: 29 },
+            { id: 5, name: "CHƯƠNG 5: TESTING FUNDAMENTALS", totalPeriods: 35 },
+            { id: 6, name: "CHƯƠNG 6: ANDROID PROFILING & PERFORMANCE ANALYSIS", totalPeriods: 50 },
+            { id: 7, name: "CHƯƠNG 7: ADVANCED TESTING & ANALYSIS", totalPeriods: 37 }
+        ];
+
+        // State
+        let completedLessons = JSON.parse(localStorage.getItem('completedLessons') || '[]');
+        let currentFilter = 'all';
+        let currentChapter = 'all';
+        let searchQuery = '';
+
+        // Functions
+        function saveProgress() {
+            localStorage.setItem('completedLessons', JSON.stringify(completedLessons));
+            updateStats();
+        }
+
+        function toggleLesson(lessonId) {
+            const index = completedLessons.indexOf(lessonId);
+            if (index === -1) {
+                completedLessons.push(lessonId);
+            } else {
+                completedLessons.splice(index, 1);
+            }
+            saveProgress();
+            renderChapters();
+        }
+
+        function updateStats() {
+            const totalLessons = courseData.length;
+            const completed = completedLessons.length;
+            const totalPeriods = courseData.reduce((sum, lesson) => sum + lesson.numPeriods, 0);
+            const completedPeriods = courseData
+                .filter(lesson => completedLessons.includes(lesson.id))
+                .reduce((sum, lesson) => sum + lesson.numPeriods, 0);
+            const percent = totalLessons > 0 ? Math.round((completed / totalLessons) * 100) : 0;
+
+            document.getElementById('total-lessons').textContent = totalLessons;
+            document.getElementById('completed-lessons').textContent = completed;
+            document.getElementById('total-periods').textContent = totalPeriods;
+            document.getElementById('progress-percent').textContent = percent + '%';
+            document.getElementById('main-progress').style.width = percent + '%';
+        }
+
+        function getFilteredLessons() {
+            return courseData.filter(lesson => {
+                const matchesChapter = currentChapter === 'all' || lesson.chapter === parseInt(currentChapter);
+                const matchesStatus = currentFilter === 'all' ||
+                    (currentFilter === 'completed' && completedLessons.includes(lesson.id)) ||
+                    (currentFilter === 'incomplete' && !completedLessons.includes(lesson.id));
+                const matchesSearch = searchQuery === '' ||
+                    lesson.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    lesson.detail.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesChapter && matchesStatus && matchesSearch;
+            });
+        }
+
+        function renderChapters() {
+            const container = document.getElementById('chapters-container');
+            const filteredLessons = getFilteredLessons();
+
+            // Group by chapter
+            const groupedByChapter = {};
+            filteredLessons.forEach(lesson => {
+                if (!groupedByChapter[lesson.chapter]) {
+                    groupedByChapter[lesson.chapter] = [];
+                }
+                groupedByChapter[lesson.chapter].push(lesson);
+            });
+
+            container.innerHTML = '';
+
+            chapters.forEach(chapter => {
+                if (!groupedByChapter[chapter.id] || groupedByChapter[chapter.id].length === 0) return;
+
+                const chapterLessons = groupedByChapter[chapter.id];
+                const completedInChapter = chapterLessons.filter(l => completedLessons.includes(l.id)).length;
+                const totalInChapter = courseData.filter(l => l.chapter === chapter.id).length;
+
+                const chapterEl = document.createElement('div');
+                chapterEl.className = 'chapter';
+                chapterEl.innerHTML = `
+                    <div class="chapter-header" onclick="toggleChapter(${chapter.id})">
+                        <h2>${chapter.name}</h2>
+                        <span class="chapter-progress">${completedInChapter}/${totalInChapter} bài</span>
+                    </div>
+                    <div class="chapter-content open" id="chapter-${chapter.id}">
+                        ${chapterLessons.map(lesson => renderLesson(lesson)).join('')}
+                    </div>
+                `;
+                container.appendChild(chapterEl);
+            });
+        }
+
+        function renderLesson(lesson) {
+            const isCompleted = completedLessons.includes(lesson.id);
+            let noteClass = '';
+            if (lesson.note.includes('quan trọng') || lesson.note.includes('CRITICAL') || lesson.note.includes('Important')) {
+                noteClass = 'important';
+            } else if (lesson.note.includes('NEW') || lesson.note.includes('Enhanced')) {
+                noteClass = 'new';
+            }
+
+            return `
+                <div class="lesson ${isCompleted ? 'completed' : ''}">
+                    <input type="checkbox" class="lesson-checkbox"
+                        ${isCompleted ? 'checked' : ''}
+                        onchange="toggleLesson(${lesson.id})">
+                    <div class="lesson-number">${lesson.id}</div>
+                    <div class="lesson-info">
+                        <div class="lesson-title">${lesson.title}</div>
+                        <div class="lesson-meta">
+                            <span>📚 Tiết: ${lesson.periods}</span>
+                            <span>⏱️ ${lesson.numPeriods} tiết</span>
+                            ${lesson.prerequisite ? `<span>📋 Tiên quyết: ${lesson.prerequisite}</span>` : ''}
+                        </div>
+                        ${lesson.note ? `<span class="lesson-note ${noteClass}">${lesson.note}</span>` : ''}
+                    </div>
+                    <button class="view-detail" onclick="showDetail(${lesson.id})">Chi tiết</button>
+                </div>
+            `;
+        }
+
+        function toggleChapter(chapterId) {
+            const content = document.getElementById(`chapter-${chapterId}`);
+            content.classList.toggle('open');
+        }
+
+        function showDetail(lessonId) {
+            const lesson = courseData.find(l => l.id === lessonId);
+            if (!lesson) return;
+
+            document.getElementById('modal-title').textContent = lesson.title;
+            document.getElementById('modal-lesson-id').textContent = `Bài ${lesson.id} | Tiết ${lesson.periods}`;
+            document.getElementById('modal-detail').textContent = lesson.detail;
+
+            document.getElementById('modal-meta').innerHTML = `
+                <div class="meta-item">
+                    <label>Số tiết</label>
+                    <p>${lesson.numPeriods} tiết</p>
+                </div>
+                <div class="meta-item">
+                    <label>Chương</label>
+                    <p>${chapters.find(c => c.id === lesson.chapter).name.split(':')[0]}</p>
+                </div>
+                ${lesson.note ? `
+                <div class="meta-item">
+                    <label>Ghi chú</label>
+                    <p>${lesson.note}</p>
+                </div>
+                ` : ''}
+            `;
+
+            if (lesson.prerequisite) {
+                document.getElementById('prerequisite-section').style.display = 'block';
+                document.getElementById('modal-prerequisite').textContent = lesson.prerequisite;
+            } else {
+                document.getElementById('prerequisite-section').style.display = 'none';
+            }
+
+            document.getElementById('lesson-modal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('lesson-modal').classList.remove('show');
+        }
+
+        function resetProgress() {
+            if (confirm('Bạn có chắc muốn xóa tất cả tiến độ học tập?')) {
+                completedLessons = [];
+                saveProgress();
+                renderChapters();
+            }
+        }
+
+        // Event listeners
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            renderChapters();
+        });
+
+        document.getElementById('chapter-filter').addEventListener('change', (e) => {
+            currentChapter = e.target.value;
+            renderChapters();
+        });
+
+        document.querySelectorAll('.status-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.status;
+                renderChapters();
+            });
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('lesson-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'lesson-modal') {
+                closeModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Initialize
+        updateStats();
+        renderChapters();
+    </script>
+</body>
+</html>
